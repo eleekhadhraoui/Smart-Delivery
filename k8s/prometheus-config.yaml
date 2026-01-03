@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: monitoring
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    scrape_configs:
+      # Scrape FastAPI services /metrics endpoint
+      - job_name: 'order-service'
+        static_configs:
+          - targets: ['order-service.default.svc.cluster.local:8000']
+        metrics_path: '/metrics'
+
+      - job_name: 'delivery-service'
+        static_configs:
+          - targets: ['delivery-service.default.svc.cluster.local:8000']
+        metrics_path: '/metrics'
+
+      - job_name: 'notification-service'
+        static_configs:
+          - targets: ['notification-service.default.svc.cluster.local:8000']
+        metrics_path: '/metrics'
+
+      - job_name: 'tracking-service'
+        static_configs:
+          - targets: ['tracking-service.default.svc.cluster.local:8000']
+        metrics_path: '/metrics'
+
+      # Scrape Dapr sidecars (if needed)
+      - job_name: 'dapr-sidecars'
+        static_configs:
+          - targets:
+              - 'order-service.default.svc.cluster.local:9090'
+              - 'delivery-service.default.svc.cluster.local:9090'
+              - 'notification-service.default.svc.cluster.local:9090'
+              - 'tracking-service.default.svc.cluster.local:9090'
+        metrics_path: '/metrics'

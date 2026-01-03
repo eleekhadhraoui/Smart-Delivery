@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tracking-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tracking-service
+  template:
+    metadata:
+      labels:
+        app: tracking-service
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "tracking-service"
+        dapr.io/app-port: "8000"
+        dapr.io/enable-metrics: "true"
+        dapr.io/metrics-port: "9090"
+    spec:
+      containers:
+        - name: tracking-service
+          image: tracking-service:clean
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tracking-service
+spec:
+  selector:
+    app: tracking-service
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+    - name: dapr-metrics
+      port: 9090
+      targetPort: 9090
+

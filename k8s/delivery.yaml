@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: delivery-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: delivery-service
+  template:
+    metadata:
+      labels:
+        app: delivery-service
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "delivery-service"
+        dapr.io/app-port: "8000"
+        dapr.io/enable-metrics: "true"
+        dapr.io/metrics-port: "9090"
+    spec:
+      containers:
+        - name: delivery-service
+          image: delivery-service:clean
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: delivery-service
+spec:
+  selector:
+    app: delivery-service
+  ports:
+    - name: http
+      port: 8000
+      targetPort: 8000
+    - name: dapr-metrics
+      port: 9090
+      targetPort: 9090
