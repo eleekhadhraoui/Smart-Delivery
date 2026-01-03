@@ -31,6 +31,9 @@ jobs:
         minikube image load delivery-service
         minikube image load tracking-service
         minikube image load notification-service
+    - name: Create namespaces
+      run: |
+        kubectl apply -f k8s/namespace.yaml
 
     - name: Deploy to Kubernetes
       run: |
